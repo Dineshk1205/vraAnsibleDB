@@ -1,0 +1,31 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Creating a file with content
+      ansible.builtin.yum_repository:
+        name: MariaDB
+        description: mariadb repo
+        baseurl: http://172.16.25.206/mariadb/11
+        gpgcheck: yes
+        gpgkey: http://172.16.25.206/mariadb/RPM-GPG-KEY-MariaDB
+    - name: update all packages
+      dnf:
+        name: "*"
+        state: latest
+    - name: Install MariaDB
+      dnf:
+        name: 
+          - MariaDB-server 
+          - MariaDB-client
+        state: latest
+    - name: Start service mariadb, if not started
+      ansible.builtin.service:
+        name: mariadb
+        state: started
+    - name: Enable service httpd, and not touch the state
+      ansible.builtin.service:
+        name: mariadb
+        enabled: yes
+  
